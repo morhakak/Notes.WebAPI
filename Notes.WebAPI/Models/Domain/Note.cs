@@ -8,4 +8,7 @@ public class Note
     public bool IsLiked { get; set; }
     public bool IsDone { get; set; }
     public string CreatedAt { get; set; } = DateTime.Now.ToString("dd/MM/yyyy hh:mm tt");
+
+    public string UserId { get; set; } 
+    public ApplicationUser User { get; set; }
 }

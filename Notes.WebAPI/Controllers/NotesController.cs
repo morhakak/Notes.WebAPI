@@ -13,13 +13,11 @@ namespace Notes.WebAPI.Controllers;
 [ApiController]
 public class NotesController : ControllerBase
 {
-    private readonly NotesDbContext _dbContext;
     private readonly INoteRepository _noteRepository;
     private readonly IMapper _mapper;
 
-    public NotesController(NotesDbContext dbContext, INoteRepository noteRepository, IMapper mapper)
+    public NotesController(INoteRepository noteRepository, IMapper mapper)
     {
-        _dbContext = dbContext;
         _noteRepository = noteRepository;
         _mapper = mapper;
     }
@@ -53,6 +51,8 @@ public class NotesController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateNoteDto createNoteDto)
     {
        var noteDomain =  _mapper.Map<Note>(createNoteDto);
+
+       noteDomain.UserId = "4a31ace4-0838-46e4-a6ae-46231a34eab6";
 
        noteDomain =  await _noteRepository.CreateAsync(noteDomain);
 

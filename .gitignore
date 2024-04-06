@@ -10,9 +10,6 @@
 *.userosscache
 *.sln.docstates
 
-appsettings.json
-launchSetting.json
-
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -367,3 +364,6 @@ FodyWeavers.xsd
 /Notes.WebAPI/Notes.WebAPI.csproj
 /Notes.WebAPI/appsettings.json
 /Notes.WebAPI/Properties/launchSettings.json
+
+/Notes.WebAPI/Migrations/*.cs
+
