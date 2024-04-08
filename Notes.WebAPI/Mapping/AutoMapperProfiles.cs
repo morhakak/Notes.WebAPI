@@ -13,6 +13,7 @@ namespace Notes.WebAPI.Mapping
             CreateMap<UpdateNoteRequestDto, Note>().ReverseMap();
             CreateMap<UpdateIsLikedRequestDto, Note>().ReverseMap();
             CreateMap<UpdateIsDoneRequestDto, Note>().ReverseMap();
+            CreateMap<RegisterRequestDto, ApplicationUser>().ReverseMap();
         }
     }
 }

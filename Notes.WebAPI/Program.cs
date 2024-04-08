@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using Notes.WebAPI.Data;
 using Notes.WebAPI.Mapping;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Repositories;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +42,13 @@ builder.Services.AddScoped<IAuthRepository, SQLAuthRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
+
+builder.Services.AddAuthorization(auth =>
+{
+    auth.AddPolicy("AppUser", new AuthorizationPolicyBuilder()
+    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+    .RequireClaim(ClaimTypes.Role,"user").Build());
+});
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

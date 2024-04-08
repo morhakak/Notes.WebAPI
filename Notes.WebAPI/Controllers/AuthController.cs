@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Models.DTO;
 using Notes.WebAPI.Repositories;
@@ -16,16 +17,11 @@ public class AuthController : ControllerBase
         _authRepository = authRepository;
     }
 
+    [AllowAnonymous]
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
     {
-        var appUser = new ApplicationUser
-        {
-            Email = registerRequestDto.Email,
-            UserName = registerRequestDto.Email
-        };
-
-        var response = await _authRepository.Register(appUser, registerRequestDto.Password);
+        var response = await _authRepository.Register(registerRequestDto, registerRequestDto.Password);
 
         if (response.Success)
         {

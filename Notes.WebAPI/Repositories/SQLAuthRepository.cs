@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Notes.WebAPI.Data;
 using Notes.WebAPI.Models.Domain;
+using Notes.WebAPI.Models.DTO;
 
 namespace Notes.WebAPI.Repositories;
 
@@ -9,12 +11,14 @@ public class SQLAuthRepository : IAuthRepository
     private readonly NotesDbContext _notesDbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ITokenRepository _tokenRepository;
+    private readonly IMapper _mapper;
 
-    public SQLAuthRepository(NotesDbContext dbContext, UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository)
+    public SQLAuthRepository(NotesDbContext dbContext, UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository, IMapper mapper)
     {
         _notesDbContext = dbContext;
         _userManager = userManager;
         _tokenRepository = tokenRepository;
+        _mapper = mapper;
     }
 
     public async Task<ApiResponse<string>> Login(ApplicationUser user,string password)
@@ -53,9 +57,27 @@ public class SQLAuthRepository : IAuthRepository
         };
     }
 
-    public async Task<ApiResponse<string>> Register(ApplicationUser user, string password)
+    public async Task<ApiResponse<string>> Register(RegisterRequestDto userDto, string password)
     {
-       var result = await _userManager.CreateAsync(user,password);
+        var existingUser = _userManager.FindByEmailAsync(userDto.Email);
+
+        if (existingUser is null)
+        {
+            return new ApiResponse<string>
+            {
+                Data = null,
+                Success = false,
+                Message = "User already exists"
+            };
+        }
+
+        var user = new ApplicationUser
+        {
+            Email = userDto.Email,
+            UserName = userDto.Email
+        };
+
+        var result = await _userManager.CreateAsync(user, password);
 
         if (result.Succeeded)
         {
@@ -71,7 +93,7 @@ public class SQLAuthRepository : IAuthRepository
         return new ApiResponse<string>
         {
             Success = false,
-            Message = "Something went wrong, unable to register user",
+            Message = $"Something went wrong, unable to register user: {result.Errors.FirstOrDefault()?.Description}",
             Data = null
         };
     }

@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Notes.WebAPI.Data;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Models.DTO;
 using Notes.WebAPI.Repositories;
@@ -11,6 +9,7 @@ namespace Notes.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Policy = "AppUser")]
 public class NotesController : ControllerBase
 {
     private readonly INoteRepository _noteRepository;
