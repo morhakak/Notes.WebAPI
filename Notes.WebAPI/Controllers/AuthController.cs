@@ -43,7 +43,7 @@ public class AuthController : ControllerBase
 
         if (response.Success)
         {
-            return Ok(response.Data); 
+            return Ok(response.Message); 
         }
 
         return BadRequest(response.Message);

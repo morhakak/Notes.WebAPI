@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Notes.WebAPI.Data;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Models.DTO;
 using Notes.WebAPI.Repositories;
+using System.Security.Claims;
 
 namespace Notes.WebAPI.Controllers;
 
@@ -14,17 +17,32 @@ public class NotesController : ControllerBase
 {
     private readonly INoteRepository _noteRepository;
     private readonly IMapper _mapper;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly NotesDbContext _notesDbContext;
 
-    public NotesController(INoteRepository noteRepository, IMapper mapper)
+    public NotesController(INoteRepository noteRepository, IMapper mapper, UserManager<ApplicationUser> userManager, NotesDbContext dbContext)
     {
         _noteRepository = noteRepository;
         _mapper = mapper;
+        _userManager = userManager;
+        _notesDbContext = dbContext;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var notesDomain = await _noteRepository.GetAllAsync();
+        // Get the user ID from the claims
+        var userId = HttpContext.User.FindFirst("id")?.Value;
+
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        // Get all notes belonging to the user
+        var notesDomain = await _noteRepository.GetNotesByUserIdAsync(userId);
+
+        //var notesDomain = await _noteRepository.GetAllAsync();
 
         var notesDto = _mapper.Map<List<NoteDto>>(notesDomain);
 
@@ -51,9 +69,18 @@ public class NotesController : ControllerBase
     {
        var noteDomain =  _mapper.Map<Note>(createNoteDto);
 
-       noteDomain.UserId = "4a31ace4-0838-46e4-a6ae-46231a34eab6";
+        var claim = HttpContext.User.FindFirst("id");
 
-       noteDomain =  await _noteRepository.CreateAsync(noteDomain);
+        var user = await _notesDbContext.Users.FindAsync(claim?.Value);
+
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        noteDomain.UserId = user.Id;
+
+        noteDomain =  await _noteRepository.CreateAsync(noteDomain);
 
         var noteDto = _mapper.Map<NoteDto>(noteDomain);
 

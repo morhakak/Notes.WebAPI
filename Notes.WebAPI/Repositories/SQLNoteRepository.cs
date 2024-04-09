@@ -16,8 +16,8 @@ public class SQLNoteRepository : INoteRepository
     public async Task<Note> CreateAsync(Note note)
     {
        await _notesDbContext.Notes.AddAsync(note);
-        await _notesDbContext.SaveChangesAsync();
-        return note;
+       await _notesDbContext.SaveChangesAsync();
+       return note;
     }
 
     public async Task<Note?> DeleteAsync(Guid id)
@@ -43,6 +43,13 @@ public class SQLNoteRepository : INoteRepository
     public async Task<Note?> GetByIdAsync(Guid id)
     {
         return await _notesDbContext.Notes.FindAsync(id);
+    }
+
+    public Task<List<Note>> GetNotesByUserIdAsync(string userId)
+    {
+        var notes = _notesDbContext.Notes.Where(note => note.UserId == userId).ToListAsync();
+
+        return notes;
     }
 
     public async Task<Note?> UpdateIsDoneAsync(Guid id, Note note)

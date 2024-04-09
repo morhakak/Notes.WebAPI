@@ -23,7 +23,7 @@ public class SQLAuthRepository : IAuthRepository
 
     public async Task<ApiResponse<string>> Login(ApplicationUser user,string password)
     {
-        var existingUser =  await _userManager.FindByEmailAsync(user.Email);
+        var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser == null)
         {
