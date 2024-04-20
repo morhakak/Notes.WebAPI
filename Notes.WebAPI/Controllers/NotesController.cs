@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Notes.WebAPI.CustomActionFilters;
 using Notes.WebAPI.Data;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Models.DTO;
@@ -31,18 +32,14 @@ public class NotesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        // Get the user ID from the claims
-        var userId = HttpContext.User.FindFirst("id")?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (userId == null)
         {
             return Unauthorized();
         }
 
-        // Get all notes belonging to the user
         var notesDomain = await _noteRepository.GetNotesByUserIdAsync(userId);
-
-        //var notesDomain = await _noteRepository.GetAllAsync();
 
         var notesDto = _mapper.Map<List<NoteDto>>(notesDomain);
 
@@ -65,6 +62,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpPost]
+    [ValidateModel]
     public async Task<IActionResult> Create([FromBody] CreateNoteDto createNoteDto)
     {
        var noteDomain =  _mapper.Map<Note>(createNoteDto);
@@ -86,23 +84,6 @@ public class NotesController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = noteDomain.Id }, noteDto);
     }
-
-    //[HttpPut("{id:Guid}")]
-    //public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateNoteRequestDto updateNoteRequestDto)
-    //{
-    //    var noteDomain = _mapper.Map<Note>(updateNoteRequestDto);
-
-    //    noteDomain = await _noteRepository.UpdateAsync(id, noteDomain);
-
-    //    if (noteDomain == null)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    var noteDto = _mapper.Map<NoteDto>(noteDomain);
-
-    //    return Ok(noteDto);
-    //}
 
     [HttpPut("{id:Guid}/isLiked")]
     public async Task<IActionResult> UpdateIsLiked([FromRoute] Guid id, [FromBody] UpdateIsLikedRequestDto updateIsLikedRequestDto)

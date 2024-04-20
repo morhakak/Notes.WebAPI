@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Notes.WebAPI.CustomActionFilters;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Models.DTO;
 using Notes.WebAPI.Repositories;
@@ -17,21 +17,22 @@ public class AuthController : ControllerBase
         _authRepository = authRepository;
     }
 
-    [AllowAnonymous]
     [HttpPost("Register")]
+    [ValidateModel]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
     {
         var response = await _authRepository.Register(registerRequestDto, registerRequestDto.Password);
 
         if (response.Success)
         {
-            return Ok(response.Message);
+            return Ok(response);
         }
 
-        return BadRequest(response.Message);
+        return BadRequest(response);
     }
 
     [HttpPost("Login")]
+    [ValidateModel]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
     {
         var appUser = new ApplicationUser
@@ -46,6 +47,6 @@ public class AuthController : ControllerBase
             return Ok(response); 
         }
 
-        return BadRequest(response.Message);
+        return BadRequest(response);
     }
 }

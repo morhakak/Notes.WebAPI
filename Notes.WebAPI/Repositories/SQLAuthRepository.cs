@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Notes.WebAPI.Data;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Models.DTO;
+using System.Net;
 
 namespace Notes.WebAPI.Repositories;
 
@@ -11,27 +11,35 @@ public class SQLAuthRepository : IAuthRepository
     private readonly NotesDbContext _notesDbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ITokenRepository _tokenRepository;
-    private readonly IMapper _mapper;
 
-    public SQLAuthRepository(NotesDbContext dbContext, UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository, IMapper mapper)
+    public SQLAuthRepository(NotesDbContext dbContext, UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository)
     {
         _notesDbContext = dbContext;
         _userManager = userManager;
         _tokenRepository = tokenRepository;
-        _mapper = mapper;
     }
 
     public async Task<ApiResponse<string>> Login(ApplicationUser user,string password)
     {
-        var existingUser = await _userManager.FindByEmailAsync(user.Email);
+        if (user is null) 
+        {
+            return new ApiResponse<string>
+            {
+                Success = false,
+                StatusCode = HttpStatusCode.BadRequest,
+                Message = "Invalid user"
+            };
+        }
+
+        var existingUser = await _userManager.FindByEmailAsync(user.Email!);
 
         if (existingUser == null)
         {
             return new ApiResponse<string>
             {
                 Success = false,
+                StatusCode = HttpStatusCode.BadRequest,
                 Message = "Incorrect email or password",
-                Data = null
             };
         }
 
@@ -42,8 +50,8 @@ public class SQLAuthRepository : IAuthRepository
             return new ApiResponse<string>
             {
                 Success = false,
+                StatusCode = HttpStatusCode.BadRequest,
                 Message = "Incorrect email or password",
-                Data = null
             };
         }
 
@@ -52,6 +60,7 @@ public class SQLAuthRepository : IAuthRepository
         return new ApiResponse<string>
         {
             Success = true,
+            StatusCode = HttpStatusCode.OK,
             Message = "User logged in successfully",
             Data = token
         };
@@ -61,12 +70,12 @@ public class SQLAuthRepository : IAuthRepository
     {
         var existingUser = _userManager.FindByEmailAsync(userDto.Email);
 
-        if (existingUser is null)
+        if (existingUser is not null)
         {
             return new ApiResponse<string>
             {
-                Data = null,
                 Success = false,
+                StatusCode = HttpStatusCode.BadRequest,
                 Message = "User already exists"
             };
         }
@@ -85,16 +94,16 @@ public class SQLAuthRepository : IAuthRepository
             return new ApiResponse<string>
             {
                 Success = true,
+                StatusCode = HttpStatusCode.OK,
                 Message = "User registered successfully",
-                Data = null
             };
         }
 
         return new ApiResponse<string>
         {
             Success = false,
+            StatusCode = HttpStatusCode.InternalServerError,
             Message = $"Something went wrong, unable to register user: {result.Errors.FirstOrDefault()?.Description}",
-            Data = null
         };
     }
 }
