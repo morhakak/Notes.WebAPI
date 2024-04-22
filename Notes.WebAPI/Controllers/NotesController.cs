@@ -67,9 +67,9 @@ public class NotesController : ControllerBase
     {
        var noteDomain =  _mapper.Map<Note>(createNoteDto);
 
-        var claim = HttpContext.User.FindFirst("id");
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        var user = await _notesDbContext.Users.FindAsync(claim?.Value);
+        var user = await _notesDbContext.Users.FindAsync(userId);
 
         if (user == null)
         {

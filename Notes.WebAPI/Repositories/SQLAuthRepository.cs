@@ -70,7 +70,7 @@ public class SQLAuthRepository : IAuthRepository
     {
         var existingUser = _userManager.FindByEmailAsync(userDto.Email);
 
-        if (existingUser is not null)
+        if (existingUser.Result is not null)
         {
             return new ApiResponse<string>
             {
