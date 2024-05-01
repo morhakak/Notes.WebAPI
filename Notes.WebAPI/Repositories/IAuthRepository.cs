@@ -5,6 +5,6 @@ namespace Notes.WebAPI.Repositories;
 
 public interface IAuthRepository
 {
-    Task<ApiResponse<string>> Register(RegisterRequestDto user, string password);
+    Task<ApiResponse<string>> Register(string email, string password);
     Task<ApiResponse<string>> Login(ApplicationUser user, string password);
 }

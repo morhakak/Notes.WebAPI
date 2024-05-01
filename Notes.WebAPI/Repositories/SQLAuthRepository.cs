@@ -66,9 +66,9 @@ public class SQLAuthRepository : IAuthRepository
         };
     }
 
-    public async Task<ApiResponse<string>> Register(RegisterRequestDto userDto, string password)
+    public async Task<ApiResponse<string>> Register(string email, string password)
     {
-        var existingUser = _userManager.FindByEmailAsync(userDto.Email);
+        var existingUser = _userManager.FindByEmailAsync(email);
 
         if (existingUser.Result is not null)
         {
@@ -82,8 +82,8 @@ public class SQLAuthRepository : IAuthRepository
 
         var user = new ApplicationUser
         {
-            Email = userDto.Email,
-            UserName = userDto.Email
+            Email = email,
+            UserName = email
         };
 
         var result = await _userManager.CreateAsync(user, password);

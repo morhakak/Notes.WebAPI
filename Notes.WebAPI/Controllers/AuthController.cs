@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
     [ValidateModel]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
     {
-        var response = await _authRepository.Register(registerRequestDto, registerRequestDto.Password);
+        var response = await _authRepository.Register(registerRequestDto.Email, registerRequestDto.Password);
 
         if (response.Success)
         {
