@@ -13,7 +13,7 @@ namespace Notes.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Policy = "AppUser")]
+
 public class NotesController : ControllerBase
 {
     private readonly INoteRepository _noteRepository;
@@ -30,7 +30,8 @@ public class NotesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [Authorize(Policy = "AppUser")]
+    public async Task<IActionResult> GetAllByUser()
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -46,7 +47,20 @@ public class NotesController : ControllerBase
         return Ok(notesDto);
     }
 
+    [HttpGet("admin")]
+    [Authorize(Policy = "AppAdmin")] 
+    public async Task<IActionResult> GetAllForAdmin()
+    {
+        var notesDomain = await _noteRepository.GetAllAsync();
+
+        var notesDto = _mapper.Map<List<NoteDto>>(notesDomain);
+
+        return Ok(notesDto);
+    }
+
     [HttpGet("{id:Guid}")]
+    [Authorize(Policy = "AppUser")]
+    [Authorize(Policy = "AppAdmin")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var noteDomain = await _noteRepository.GetByIdAsync(id);
@@ -63,6 +77,8 @@ public class NotesController : ControllerBase
 
     [HttpPost]
     [ValidateModel]
+    [Authorize(Policy = "AppUser")]
+    [Authorize(Policy = "AppAdmin")]
     public async Task<IActionResult> Create([FromBody] CreateNoteDto createNoteDto)
     {
        var noteDomain =  _mapper.Map<Note>(createNoteDto);
@@ -86,6 +102,8 @@ public class NotesController : ControllerBase
     }
 
     [HttpPut("{id:Guid}/isLiked")]
+    [Authorize(Policy = "AppUser")]
+    [Authorize(Policy = "AppAdmin")]
     public async Task<IActionResult> UpdateIsLiked([FromRoute] Guid id, [FromBody] UpdateIsLikedRequestDto updateIsLikedRequestDto)
     {
         var noteDomain = _mapper.Map<Note>(updateIsLikedRequestDto);
@@ -103,6 +121,8 @@ public class NotesController : ControllerBase
     }
 
     [HttpPut("{id:Guid}/isDone")]
+    [Authorize(Policy = "AppUser")]
+    [Authorize(Policy = "AppAdmin")]
     public async Task<IActionResult> UpdateIsDone([FromRoute] Guid id, [FromBody] UpdateIsDoneRequestDto updateIsDoneRequestDto)
     {
         var noteDomain = _mapper.Map<Note>(updateIsDoneRequestDto);
@@ -120,6 +140,8 @@ public class NotesController : ControllerBase
     }
 
     [HttpDelete("{id:Guid}")]
+    [Authorize(Policy = "AppUser")]
+    [Authorize(Policy = "AppAdmin")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var noteDomain = await _noteRepository.DeleteAsync(id);

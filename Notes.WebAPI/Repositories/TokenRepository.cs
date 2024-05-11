@@ -20,8 +20,12 @@ public class TokenRepository : ITokenRepository
         {
            new(ClaimTypes.NameIdentifier,user.Id),
            new(ClaimTypes.Email, user.Email!),
-           new(ClaimTypes.Role,"user")
         };
+
+        foreach (var role in user.Roles)
+        {
+            claims.Add(new (ClaimTypes.Role, role));
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
 

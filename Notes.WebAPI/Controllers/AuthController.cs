@@ -19,7 +19,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("Register")]
     [ValidateModel]
-    public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
+    public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterRequestDto registerRequestDto)
     {
         var response = await _authRepository.Register(registerRequestDto.Email, registerRequestDto.Password);
 
@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("Login")]
     [ValidateModel]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequestDto loginRequestDto)
     {
         var appUser = new ApplicationUser
         {

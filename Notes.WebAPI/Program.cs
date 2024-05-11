@@ -59,7 +59,12 @@ builder.Services.AddAuthorization(auth =>
 {
     auth.AddPolicy("AppUser", new AuthorizationPolicyBuilder()
     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-    .RequireClaim(ClaimTypes.Role,"user").Build());
+    .RequireClaim(ClaimTypes.Role,"User").Build());
+
+    auth.AddPolicy("AppAdmin", new AuthorizationPolicyBuilder()
+    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+    .RequireClaim(ClaimTypes.Role, "Admin")
+    .Build());
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -94,6 +99,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("corsPolicy");
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseHttpsRedirection();
 

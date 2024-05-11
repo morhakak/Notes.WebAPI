@@ -5,4 +5,5 @@ namespace Notes.WebAPI.Models.Domain;
 public class ApplicationUser : IdentityUser
 {
     public List<Note> Notes { get; set; } = [];
+    public List<string> Roles { get; set; } = [];
 }
