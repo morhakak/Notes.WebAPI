@@ -7,6 +7,7 @@ using Notes.WebAPI.Data;
 using Notes.WebAPI.Mapping;
 using Notes.WebAPI.Middlewares;
 using Notes.WebAPI.Models.Domain;
+using Notes.WebAPI.Models.DTO;
 using Notes.WebAPI.Repositories;
 using Serilog;
 using System.Security.Claims;
@@ -52,6 +53,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.AddScoped<INoteRepository, SQLNoteRepository>();
 builder.Services.AddScoped<IAuthRepository, SQLAuthRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IDashboardRepository, SQLDashboardRepository>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
