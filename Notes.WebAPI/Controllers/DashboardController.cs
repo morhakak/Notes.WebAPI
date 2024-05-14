@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Notes.WebAPI.CustomActionFilters;
-using Notes.WebAPI.Models.DTO;
 using Notes.WebAPI.Repositories;
 
 namespace Notes.WebAPI.Controllers;
@@ -30,9 +29,8 @@ public class DashboardController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpDelete("users")]
-    [ValidateModel]
-    public async Task<ActionResult<ApiResponse>> DeleteUser([FromBody] string userId)
+    [HttpDelete("{userId}")]
+    public async Task<ActionResult<ApiResponse>> DeleteUser([FromRoute] string userId)
     {
         var response = await _dashboardRepository.DeleteUserAsync(userId);
 
