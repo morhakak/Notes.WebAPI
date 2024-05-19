@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Notes.WebAPI.CustomAttributes;
 using Notes.WebAPI.Data;
 using Notes.WebAPI.Mapping;
 using Notes.WebAPI.Middlewares;
@@ -54,6 +57,7 @@ builder.Services.AddScoped<INoteRepository, SQLNoteRepository>();
 builder.Services.AddScoped<IAuthRepository, SQLAuthRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IDashboardRepository, SQLDashboardRepository>();
+builder.Services.AddSingleton<IAuthorizationHandler, RolesAuthorizationHandler>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
@@ -67,6 +71,9 @@ builder.Services.AddAuthorization(auth =>
     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
     .RequireClaim(ClaimTypes.Role, "Admin")
     .Build());
+
+    auth.AddPolicy("AppUserOrAdmin", policy =>
+        policy.Requirements.Add(new RolesAuthorizationRequirement(new[] { "User", "Admin" })));
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

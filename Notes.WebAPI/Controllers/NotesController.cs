@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Notes.WebAPI.CustomActionFilters;
+using Notes.WebAPI.CustomAttributes;
 using Notes.WebAPI.Data;
 using Notes.WebAPI.Models.Domain;
 using Notes.WebAPI.Models.DTO;
@@ -77,8 +78,7 @@ public class NotesController : ControllerBase
 
     [HttpPost]
     [ValidateModel]
-    [Authorize(Policy = "AppUser")]
-    [Authorize(Policy = "AppAdmin")]
+    [RolesAuthorize("User", "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateNoteDto createNoteDto)
     {
        var noteDomain =  _mapper.Map<Note>(createNoteDto);
@@ -102,8 +102,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpPut("{id:Guid}/isLiked")]
-    [Authorize(Policy = "AppUser")]
-    [Authorize(Policy = "AppAdmin")]
+    [RolesAuthorize("User", "Admin")]
     public async Task<IActionResult> UpdateIsLiked([FromRoute] Guid id, [FromBody] UpdateIsLikedRequestDto updateIsLikedRequestDto)
     {
         var noteDomain = _mapper.Map<Note>(updateIsLikedRequestDto);
@@ -121,8 +120,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpPut("{id:Guid}/isDone")]
-    [Authorize(Policy = "AppUser")]
-    [Authorize(Policy = "AppAdmin")]
+    [RolesAuthorize("User", "Admin")]
     public async Task<IActionResult> UpdateIsDone([FromRoute] Guid id, [FromBody] UpdateIsDoneRequestDto updateIsDoneRequestDto)
     {
         var noteDomain = _mapper.Map<Note>(updateIsDoneRequestDto);
@@ -140,8 +138,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpDelete("{id:Guid}")]
-    [Authorize(Policy = "AppUser")]
-    [Authorize(Policy = "AppAdmin")]
+    [RolesAuthorize("User", "Admin")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var noteDomain = await _noteRepository.DeleteAsync(id);
